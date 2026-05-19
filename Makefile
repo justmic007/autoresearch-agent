@@ -54,6 +54,11 @@ run: ## Start the full stack (app + Redis + ChromaDB) via Docker
 dev: ## Run the API locally with hot-reload (infrastructure must be running)
 	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
+query-pretty: ## Send a query and print formatted report (usage: make query-pretty Q="your question")
+	@curl -s -X POST http://localhost:8000/research \
+		-H "Content-Type: application/json" \
+		-d '{"query": "$(Q)"}' | python app/utils/printer.py
+
 # ── testing ───────────────────────────────────────────────────────────────────
 
 test: ## Run unit tests

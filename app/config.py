@@ -14,7 +14,8 @@ LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "false")
 LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "autoresearch-agent")
 
 MODEL_NAME = "claude-sonnet-4-6"
-MAX_TOKENS = 4096
+MAX_TOKENS = 2048
+# MAX_TOKENS = 4096
 
 QUALITY_THRESHOLD = 20  # out of 30 — below this triggers a Writer revision
 MAX_REVISIONS = 1
