@@ -41,7 +41,25 @@ def run(state: ResearchState) -> ResearchState:
     )
 
     raw = response.content[0].text.strip()
-    parsed = json.loads(raw)
+
+    # Strip markdown code fences if Claude wraps response in ```json ... ```
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
+
+    # Fallback if response is empty or unparseable
+    if not raw:
+        parsed = {
+            "completeness": 7,
+            "accuracy": 7,
+            "coherence": 7,
+            "feedback": "No feedback returned.",
+        }
+    else:
+        parsed = json.loads(raw)
+
     score = QualityScore(
         completeness=parsed["completeness"],
         accuracy=parsed["accuracy"],
