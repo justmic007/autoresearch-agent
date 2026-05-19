@@ -1,4 +1,5 @@
 # Critic agent - scores report quality and triggers revision if needed
+
 import json
 import time
 from anthropic import Anthropic

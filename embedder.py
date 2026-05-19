@@ -1,4 +1,5 @@
 # ChromaDB embedder -  store and retrieve document chunks
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 from app.config import CHROMA_HOST, CHROMA_PORT, TOP_K_RAG_RESULTS

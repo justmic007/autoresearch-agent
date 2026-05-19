@@ -1,4 +1,5 @@
 # Shared LangGraph state schema - the backbone all agents read/write
+
 from typing import TypedDict, Optional
 import time
 
