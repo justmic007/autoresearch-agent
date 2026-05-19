@@ -48,10 +48,11 @@ def build_graph() -> StateGraph:
 
 
 def get_compiled_graph():
-    """Return the graph compiled with Redis checkpointer for state persistence."""
+    """Return the graph compiled with in-memory checkpointer."""
+    from langgraph.checkpoint.memory import MemorySaver
+
     graph = build_graph()
-    checkpointer = RedisSaver.from_conn_string(REDIS_URL)
-    return graph.compile(checkpointer=checkpointer)
+    return graph.compile(checkpointer=MemorySaver())
 
 
 def run_research(query: str, thread_id: str) -> ResearchState:
