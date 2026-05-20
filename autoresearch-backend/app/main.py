@@ -38,9 +38,9 @@ class ResearchResponse(BaseModel):
     metrics: list[dict]
 
 
-@app.head("/health")
-def health_head():
-    return Response(status_code=200)
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 # ── Blocking endpoint (used by CLI / make query-pretty) ───────
