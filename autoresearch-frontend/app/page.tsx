@@ -138,15 +138,15 @@ export default function Home() {
               {AGENTS.map((agent, i) => {
                 const status = pipeline[agent]
                 return (
-                  <div key={agent} className={`flex-1 py-3 text-center border-r last:border-r-0 transition-colors ${status === 'done' ? 'bg-[#0a0a0a]' :
-                      status === 'active' ? 'bg-[#ede8dc]' : ''
+                  <div key={`${agent}-${i}`} className={`flex-1 py-3 text-center border-r last:border-r-0 transition-colors ${status === 'done' ? 'bg-[#0a0a0a]' :
+                    status === 'active' ? 'bg-[#ede8dc]' : ''
                     }`} style={{ borderColor: 'var(--border)' }}>
                     <div className={`text-lg mb-1 ${status === 'active' ? 'animate-pulse' : ''}`}>
                       {AGENT_META[agent].icon}
                       {status === 'done' && <span className="text-xs"> ✓</span>}
                     </div>
                     <div className={`font-mono text-xs uppercase tracking-wider ${status === 'done' ? 'text-[var(--paper)]' :
-                        status === 'active' ? 'text-[var(--ink)]' : ''
+                      status === 'active' ? 'text-[var(--ink)]' : ''
                       }`} style={{ color: status === 'idle' ? 'var(--muted)' : undefined }}>
                       {AGENT_META[agent].label}
                     </div>
@@ -163,7 +163,7 @@ export default function Home() {
             <p className="font-mono text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>Researching</p>
             <ul className="space-y-1">
               {subtasks.map((t, i) => (
-                <li key={i} className="flex gap-2 text-sm" style={{ color: 'var(--ink)' }}>
+                <li key={`live-subtask-${i}`} className="flex gap-2 text-sm" style={{ color: 'var(--ink)' }}>
                   <span className="font-mono text-xs mt-0.5" style={{ color: 'var(--muted)' }}>0{i + 1}</span>
                   {t}
                 </li>
@@ -212,8 +212,8 @@ export default function Home() {
                 {/* Quality */}
                 <div className="bg-white border p-4" style={{ borderColor: 'var(--border)' }}>
                   <p className="font-mono text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>Quality Score</p>
-                  {(['completeness', 'accuracy', 'coherence'] as const).map(k => (
-                    <div key={k} className="flex items-center gap-2 mb-2">
+                  {(['completeness', 'accuracy', 'coherence'] as const).map((k, i) => (
+                    <div key={`score-${k}-${i}`} className="flex items-center gap-2 mb-2">
                       <span className="text-sm w-24 capitalize">{k}</span>
                       <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'var(--cream)' }}>
                         <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${(result.quality_score[k] / 10) * 100}%`, background: 'var(--ink)' }} />
@@ -242,8 +242,8 @@ export default function Home() {
                       </tr>
                     </thead>
                     <tbody>
-                      {result.metrics.map(m => (
-                        <tr key={m.agent} className="border-b last:border-b-0" style={{ borderColor: 'var(--cream)' }}>
+                      {result.metrics.map((m, i) => (
+                        <tr key={`metric-${m.agent}-${i}`} className="border-b last:border-b-0" style={{ borderColor: 'var(--cream)' }}>
                           <td className="py-1.5 capitalize">{m.agent}</td>
                           <td className="py-1.5 text-right">{Math.round(m.latency_ms)}ms</td>
                           <td className="py-1.5 text-right">{m.tokens_used || '—'}</td>
@@ -261,7 +261,7 @@ export default function Home() {
                 <p className="font-mono text-xs uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>Research Subtasks</p>
                 <ul className="space-y-2">
                   {result.subtasks.map((t, i) => (
-                    <li key={i} className="flex gap-2 text-sm border-b last:border-b-0 pb-2 last:pb-0" style={{ borderColor: 'var(--cream)' }}>
+                    <li key={`subtask-${i}`} className="flex gap-2 text-sm border-b last:border-b-0 pb-2 last:pb-0" style={{ borderColor: 'var(--cream)' }}>
                       <span className="font-mono text-xs mt-0.5 shrink-0" style={{ color: 'var(--muted)' }}>0{i + 1}</span>
                       {t}
                     </li>

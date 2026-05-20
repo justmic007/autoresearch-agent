@@ -1,6 +1,5 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+@import "tailwindcss";
 
 :root {
   --ink: #0a0a0a;
@@ -25,7 +24,6 @@ body {
   font-family: 'DM Mono', monospace;
 }
 
-/* Report markdown styles */
 .report-content h2 {
   font-family: 'DM Serif Display', serif;
   font-size: 1.4rem;
