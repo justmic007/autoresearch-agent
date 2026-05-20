@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+@import "tailwindcss";
+
+:root {
+  --ink: #0a0a0a;
+  --paper: #f5f0e8;
+  --cream: #ede8dc;
+  --accent: #c84b2f;
+  --muted: #7a7165;
+  --border: #d4cfc4;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.font-serif {
+  font-family: 'DM Serif Display', serif;
+}
+
+.font-mono {
+  font-family: 'DM Mono', monospace;
+}
+
+.report-content h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  margin: 1.8rem 0 0.6rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.report-content h2:first-child {
+  margin-top: 0;
+}
+
+.report-content h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.report-content p {
+  margin-bottom: 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.report-content ul {
+  margin: 0.6rem 0 1rem 1.4rem;
+}
+
+.report-content li {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.65;
+}
+
+.report-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  word-break: break-all;
+  font-size: 0.85rem;
+}
+
+.report-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.report-content strong {
+  font-weight: 500;
+}
