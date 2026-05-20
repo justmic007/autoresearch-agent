@@ -1,0 +1,37 @@
+[
+  {
+    "query": "What is the current state of AI regulation in the European Union?",
+    "duration_s": 48.9,
+    "tokens_used": 4981,
+    "quality_total": 26,
+    "revised": false
+  },
+  {
+    "query": "What are the latest breakthroughs in battery technology for electric vehicles?",
+    "duration_s": 45.0,
+    "tokens_used": 5587,
+    "quality_total": 24,
+    "revised": false
+  },
+  {
+    "query": "How is generative AI impacting the software engineering job market?",
+    "duration_s": 32.4,
+    "tokens_used": 5681,
+    "quality_total": 24,
+    "revised": false
+  },
+  {
+    "query": "What is the state of nuclear fusion energy development in 2025?",
+    "duration_s": 43.8,
+    "tokens_used": 6921,
+    "quality_total": 23,
+    "revised": false
+  },
+  {
+    "query": "How are central banks responding to persistent inflation globally?",
+    "duration_s": 40.1,
+    "tokens_used": 6284,
+    "quality_total": 25,
+    "revised": false
+  }
+]

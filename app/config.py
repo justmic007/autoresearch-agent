@@ -20,3 +20,5 @@ MAX_TOKENS = 2048
 QUALITY_THRESHOLD = 20  # out of 30 — below this triggers a Writer revision
 MAX_REVISIONS = 1
 TOP_K_RAG_RESULTS = 5
+
+UPSTASH_REDIS_URL = os.environ["UPSTASH_REDIS_URL"]

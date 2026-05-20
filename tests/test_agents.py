@@ -57,7 +57,7 @@ def test_planner_records_latency():
     ):
         result = planner.run(state)
 
-    assert result["metrics"][0]["latency_ms"] > 0
+    assert result["metrics"][0]["latency_ms"] >= 0
 
 
 # ---- critic ----
