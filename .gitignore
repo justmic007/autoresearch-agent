@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+.next/
+
+# Env files
+.env
+.env.local
+
+# Data
+chroma_data/
+eval_results.json
