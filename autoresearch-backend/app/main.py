@@ -2,6 +2,7 @@
 import uuid
 import time
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -37,9 +38,9 @@ class ResearchResponse(BaseModel):
     metrics: list[dict]
 
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+@app.head("/health")
+def health_head():
+    return Response(status_code=200)
 
 
 # ── Blocking endpoint (used by CLI / make query-pretty) ───────
