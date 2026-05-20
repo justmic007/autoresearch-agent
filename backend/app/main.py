@@ -2,14 +2,24 @@
 import uuid
 import time
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from app.graph.workflow import run_research
+from app.graph.workflow import run_research, stream_research
 from app.memory.redis_state import save_job, load_job, list_jobs
 
 app = FastAPI(
     title="AutoResearch Agent",
     description="Multi-agent research system: Planner → Search → RAG → Writer → Critic",
     version="1.0.0",
+)
+
+# ── CORS — allows Next.js frontend to call this API ──────────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # tighten this in production
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -32,6 +42,7 @@ def health():
     return {"status": "ok"}
 
 
+# ── Blocking endpoint (used by CLI / make query-pretty) ───────
 @app.post("/research", response_model=ResearchResponse)
 def research(req: ResearchRequest):
     if not req.query.strip():
@@ -46,8 +57,6 @@ def research(req: ResearchRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
     result["finished_at"] = time.time()
-
-    # Persist to Upstash
     save_job(thread_id, result)
 
     return ResearchResponse(
@@ -61,9 +70,33 @@ def research(req: ResearchRequest):
     )
 
 
+# ── Streaming endpoint (used by Next.js frontend) ─────────────
+@app.post("/research/stream")
+def research_stream(req: ResearchRequest):
+    """
+    Server-Sent Events stream.
+    Emits an event after each agent completes, then a final
+    'complete' event with the full report and metrics.
+    """
+    if not req.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+
+    thread_id = str(uuid.uuid4())
+
+    return StreamingResponse(
+        stream_research(query=req.query, thread_id=thread_id),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",  # disable nginx buffering
+            "X-Thread-ID": thread_id,
+        },
+    )
+
+
+# ── Job persistence endpoints ─────────────────────────────────
 @app.get("/research/{thread_id}")
 def get_job(thread_id: str):
-    """Retrieve a previously completed research job by thread_id."""
     job = load_job(thread_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -72,5 +105,4 @@ def get_job(thread_id: str):
 
 @app.get("/jobs")
 def get_jobs():
-    """List all stored research jobs (most recent first)."""
     return list_jobs()
