@@ -19,23 +19,34 @@ export async function* streamResearch(query: string) {
         if (done) break
 
         buffer += decoder.decode(value, { stream: true })
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
 
-        let eventType = ''
-        let dataLine = ''
+        // SSE messages are separated by double newlines
+        // Split on double newline to get complete messages
+        const messages = buffer.split('\n\n')
 
-        for (const line of lines) {
-            if (line.startsWith('event: ')) {
-                eventType = line.slice(7).trim()
-            } else if (line.startsWith('data: ')) {
-                dataLine = line.slice(6).trim()
-            } else if (line === '' && eventType && dataLine) {
+        // Keep the last incomplete message in buffer
+        buffer = messages.pop() || ''
+
+        for (const message of messages) {
+            if (!message.trim()) continue
+
+            let eventType = ''
+            let dataLine = ''
+
+            for (const line of message.split('\n')) {
+                if (line.startsWith('event: ')) {
+                    eventType = line.slice(7).trim()
+                } else if (line.startsWith('data: ')) {
+                    dataLine = line.slice(6).trim()
+                }
+            }
+
+            if (eventType && dataLine) {
                 try {
                     yield { event: eventType, data: JSON.parse(dataLine) }
-                } catch { }
-                eventType = ''
-                dataLine = ''
+                } catch (e) {
+                    console.error('Failed to parse SSE data:', e, dataLine)
+                }
             }
         }
     }
