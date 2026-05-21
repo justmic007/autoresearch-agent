@@ -5,6 +5,7 @@ import { streamResearch } from '@/lib/api'
 import type { PipelineState, ResearchResult, AgentDoneEvent } from '@/types/research'
 import { marked } from 'marked'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 
 
 const AGENTS = ['planner', 'search', 'rag', 'writer', 'critic'] as const
