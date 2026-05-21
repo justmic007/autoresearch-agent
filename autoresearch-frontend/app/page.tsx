@@ -5,6 +5,7 @@ import { streamResearch } from '@/lib/api'
 import type { PipelineState, ResearchResult, AgentDoneEvent } from '@/types/research'
 import { marked } from 'marked'
 import Link from 'next/link'
+import posthog from 'posthog-js'
 
 
 const AGENTS = ['planner', 'search', 'rag', 'writer', 'critic'] as const
@@ -64,6 +65,8 @@ export default function Home() {
     resetState()
     setLoading(true)
 
+    posthog.capture('research_started', { query })
+
     // Activate first agent immediately
     setAgentStatus('planner', 'active')
 
@@ -91,6 +94,13 @@ export default function Home() {
         if (event === 'complete') {
           const completeData = data as ResearchResult
           setResult(completeData)
+          posthog.capture('research_completed', {
+            query: completeData.query,
+            quality_score: completeData.quality_score?.total,
+            duration_seconds: completeData.duration_seconds,
+            total_tokens: completeData.total_tokens,
+            thread_id: completeData.thread_id,
+          })
           setLoading(false)
           AGENTS.forEach(a => setAgentStatus(a, 'done'))
 
