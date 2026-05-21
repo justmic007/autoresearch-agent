@@ -4,6 +4,8 @@ import { useState, useRef, useCallback } from 'react'
 import { streamResearch } from '@/lib/api'
 import type { PipelineState, ResearchResult, AgentDoneEvent } from '@/types/research'
 import { marked } from 'marked'
+import Link from 'next/link'
+
 
 const AGENTS = ['planner', 'search', 'rag', 'writer', 'critic'] as const
 
@@ -19,7 +21,7 @@ const initialPipeline: PipelineState = {
   planner: 'idle', search: 'idle', rag: 'idle', writer: 'idle', critic: 'idle',
 }
 
-// Fix 1: Writer active state color — use inline style instead of Tailwind
+// Writer active state color — use inline style instead of Tailwind
 // dynamic class so it works reliably in production builds
 function agentBg(status: string): React.CSSProperties {
   if (status === 'done') return { background: '#0a0a0a' }
@@ -47,7 +49,7 @@ export default function Home() {
     setPipeline(prev => ({ ...prev, [agent]: status }))
   }, [])
 
-  // Fix 2: reset all state properly before each new research
+  // reset all state properly before each new research
   function resetState() {
     setResult(null)
     setLiveReport('')
@@ -85,13 +87,26 @@ export default function Home() {
           }
         }
 
-        // Fix 3: complete event — set result AND re-enable button
+        // complete event — set result AND re-enable button
         if (event === 'complete') {
           const completeData = data as ResearchResult
           setResult(completeData)
-          setLoading(false)   // ← re-enables button
-          // Mark all agents done in case any were missed
+          setLoading(false)
           AGENTS.forEach(a => setAgentStatus(a, 'done'))
+
+          // save to localStorage
+          const historyItem = {
+            thread_id: completeData.thread_id,
+            query: completeData.query,
+            quality_score: completeData.quality_score?.total ?? 0,
+            finished_at: completeData.duration_seconds
+              ? Math.floor(Date.now() / 1000)
+              : Math.floor(Date.now() / 1000),
+          }
+          const existing = JSON.parse(localStorage.getItem('autoresearch_history') || '[]')
+          existing.unshift(historyItem)
+          localStorage.setItem('autoresearch_history', JSON.stringify(existing.slice(0, 50)))
+
           setTimeout(() => {
             outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }, 150)
@@ -134,6 +149,11 @@ export default function Home() {
             </span>
           ))}
         </div>
+        <Link href="/history"
+          className="font-mono text-xs uppercase tracking-widest px-4 py-2 border ml-4"
+          style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
+          History
+        </Link>
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-12">
