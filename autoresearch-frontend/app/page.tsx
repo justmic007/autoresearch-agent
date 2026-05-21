@@ -304,10 +304,15 @@ export default function Home() {
                       </span>
                     </div>
                     {result.quality_score?.feedback && (
-                      <p className="text-xs italic mt-2 pt-2 border-t"
-                        style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
-                        {result.quality_score.feedback}
-                      </p>
+                      <div className="mt-3 pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                        <p className="font-mono text-xs uppercase tracking-widest mb-1"
+                          style={{ color: 'var(--accent)' }}>
+                          Critic's Verdict
+                        </p>
+                        <p className="text-sm italic" style={{ color: 'var(--ink)', lineHeight: 1.6 }}>
+                          {result.quality_score.feedback}
+                        </p>
+                      </div>
                     )}
                   </div>
 
