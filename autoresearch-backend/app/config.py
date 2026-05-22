@@ -3,8 +3,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ── Anthropic (commented out — swap back by uncommenting) ──
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
+MODEL_NAME = "claude-sonnet-4-6"
+
 TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
+
+# ── Gemini (active) ────────────────────────────────────────
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+MODEL_NAME = "gemini-2.5-flash"
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
 CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
@@ -13,7 +20,6 @@ CHROMA_PORT = int(os.getenv("CHROMA_PORT", "8001"))
 LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "false")
 LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "autoresearch-agent")
 
-MODEL_NAME = "claude-sonnet-4-6"
 MAX_TOKENS = 2048
 # MAX_TOKENS = 4096
 
