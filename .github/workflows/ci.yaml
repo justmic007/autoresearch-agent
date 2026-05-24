@@ -26,7 +26,7 @@ jobs:
 
       - name: Run tests
         env:
-          ANTHROPIC_API_KEY: "sk-ant-placeholder"
+          # ANTHROPIC_API_KEY: "sk-ant-placeholder"
           TAVILY_API_KEY: "tvly-placeholder"
           LANGCHAIN_API_KEY: "lsv2_placeholder"
           REDIS_URL: "redis://localhost:6379"

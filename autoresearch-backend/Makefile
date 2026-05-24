@@ -97,6 +97,9 @@ print(); \
 print('Quality:', result['quality_score']['total'], '/ 30'); \
 print('Duration:', round(result['finished_at'] - result['started_at'], 1), 's')"
 
+test-providers: ## Test all configured providers individually
+	python -m app.utils.test_providers
+
 # ── evaluation ────────────────────────────────────────────────────────────────
 
 benchmark: ## Run the 5-query benchmark and print metrics table
