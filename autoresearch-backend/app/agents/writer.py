@@ -35,18 +35,24 @@ search results, and retrieved context, write a clear, well-structured report.
 
 Your report MUST follow this exact structure:
 ## Executive Summary
-(2-3 sentences summarising the key answer)
+(2-3 sentences summarising the key answer with at least one specific fact, number, or date)
 
 ## Key Findings
-(3-5 bullet points, each a distinct insight)
+(3-5 bullet points — each MUST include a specific statistic, figure, date, or named entity
+directly extracted from the provided sources. No vague generalisations.)
 
 ## Analysis
-(2-3 paragraphs of deeper analysis)
+(2-3 paragraphs of deeper analysis grounded in the source data.
+Every claim must reference a specific source, number, or named organisation.)
 
 ## Sources
 (list each source URL used)
 
-Be factual, cite specific details from the provided context, and be concise."""
+CRITICAL RULES:
+- Extract and use EXACT numbers, dates, percentages, and named entities from the context
+- Never write vague phrases like "significant progress" or "many experts" — name them
+- Every bullet point must contain at least one hard fact (number, date, name, or measurement)
+- If a source contains specific data, you MUST include it"""
 
 TIMEOUT = 30
 
