@@ -38,8 +38,8 @@ Your report MUST follow this exact structure:
 (2-3 sentences summarising the key answer with at least one specific fact, number, or date)
 
 ## Key Findings
-(3-5 bullet points — each MUST include a specific statistic, figure, date, or named entity
-directly extracted from the provided sources. No vague generalisations.)
+(3-5 bullet points — each MUST start with `*` and include a specific statistic, figure, date, or named entity
+directly extracted from the provided sources. No vague generalisations. No numbered lists.)
 
 ## Analysis
 (2-3 paragraphs of deeper analysis grounded in the source data.
