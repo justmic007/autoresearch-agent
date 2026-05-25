@@ -192,7 +192,11 @@ export default function Home() {
                 cursor: loading ? 'not-allowed' : 'pointer',
               }}
             >
-              {loading ? '…' : '→'}
+              {loading ? (
+                <span><span className="hidden sm:inline">Researching</span><span>…</span></span>
+              ) : (
+                <span><span className="hidden sm:inline">Research </span><span>→</span></span>
+              )}
             </button>
           </div>
         </div>
