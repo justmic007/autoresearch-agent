@@ -3,18 +3,18 @@
 # Fallback chain (ranked by quality then reliability):
 #   1. SambaNova DeepSeek-V3.2    — best reasoning, free
 #   2. Gemini 2.5-flash-lite      — highest quality in benchmarks, 1,500 req/day
-#   3. NVIDIA deepseek-v4-flash   — strong reasoning, no daily cap
-#   4. Cerebras qwen3-235b        — large model, good prose, free
-#   5. NVIDIA llama-3.3-70b       — no daily cap, reliable fallback
-#   6. SambaNova llama-3.3-70b    — fast, good output length, free
-#   7. SambaNova llama-4-maverick  — fastest, shorter output, free
-#   8. Groq llama-3.3-70b         — fast, 1,000 req/day cap
-#   9. HF/novita llama-3.3-70b    — free but slow (~11s)
-#  10. Mistral small              — slowest (~9s), 1B tokens/month
+#   3. Cerebras qwen3-235b        — large model, good prose, consistent
+#   4. NVIDIA llama-3.3-70b       — no daily cap, reliable
+#   5. SambaNova llama-3.3-70b    — fast, good output length, free
+#   6. SambaNova llama-4-maverick  — fastest, shorter output, free
+#   7. Groq llama-3.3-70b         — fast, 1,000 req/day cap
+#   8. HF/novita llama-3.3-70b    — free but slow (~11s)
+#   9. Mistral small              — slowest (~9s), 1B tokens/month
+#  10. NVIDIA deepseek-v4-flash   — strong reasoning but times out often (45s+)
 #  11. OpenRouter gemma-4-26b     — free, last resort (rate-limited often)
 #  12. Static fallback            — never fails
 #
-# Revision pass prepends: SambaNova DeepSeek-V3.2 → NVIDIA deepseek-v4-flash
+# Revision pass prepends: SambaNova DeepSeek-V3.2 → Gemini 2.5-flash-lite
 
 import time
 from app.graph.state import ResearchState, AgentMetrics
@@ -152,18 +152,13 @@ def run(state: ResearchState) -> ResearchState:
         if SAMBANOVA_API_KEY:
             providers.append(("sambanova-deepseek", lambda c: _call_openai_compatible(
                 "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL_DEEPSEEK, c)))
-        if NVIDIA_API_KEY:
-            providers.append(("nvidia-deepseek", lambda c: _call_openai_compatible(
-                "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_WRITER, c)))
+        providers.append(("gemini", _try_gemini))
 
     # Primary chain
     if SAMBANOVA_API_KEY:
         providers.append(("sambanova-deepseek", lambda c: _call_openai_compatible(
             "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL_DEEPSEEK, c)))
     providers.append(("gemini", _try_gemini))
-    if NVIDIA_API_KEY:
-        providers.append(("nvidia-deepseek", lambda c: _call_openai_compatible(
-            "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_WRITER, c)))
     if CEREBRAS_API_KEY:
         providers.append(("cerebras-qwen3", lambda c: _call_openai_compatible(
             "https://api.cerebras.ai/v1", CEREBRAS_API_KEY, CEREBRAS_MODEL_LARGE, c)))
@@ -182,6 +177,9 @@ def run(state: ResearchState) -> ResearchState:
     if MISTRAL_API_KEY:
         providers.append(("mistral", lambda c: _call_openai_compatible(
             "https://api.mistral.ai/v1", MISTRAL_API_KEY, MISTRAL_MODEL, c)))
+    if NVIDIA_API_KEY:
+        providers.append(("nvidia-deepseek", lambda c: _call_openai_compatible(
+            "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_WRITER, c)))
     if OPENROUTER_API_KEY:
         providers.append(("openrouter-gemma", lambda c: _call_openai_compatible(
             "https://openrouter.ai/api/v1", OPENROUTER_API_KEY, OPENROUTER_MODEL, c)))
