@@ -1,17 +1,17 @@
 # Writer agent - synthesises final report from all gathered context
 #
-# Fallback chain:
-#   1. SambaNova DeepSeek-V3.2    — 1.7s,   best reasoning, free
-#   2. Gemini 2.5-flash-lite      — 786ms,  fast, high quality, 1,500 req/day
-#   3. NVIDIA deepseek-v4-flash   — 3.5s,   no daily cap
-#   4. NVIDIA llama-3.3-70b       — 916ms,  no daily cap
-#   5. SambaNova llama-4-maverick  — 1.4s,  free
-#   6. SambaNova llama-3.3-70b    — 1.9s,   free
-#   7. Cerebras qwen3-235b        — 3.1s,   large model, good prose
-#   8. HF/novita llama-3.3-70b    — 816ms,  free
-#   9. Groq llama-3.3-70b         — 1.4s,   1,000 req/day
-#  10. Mistral small              — 1.0s,   1B tokens/month
-#  11. OpenRouter gemma-4-26b     — 922ms,  free
+# Fallback chain (ranked by quality then reliability):
+#   1. SambaNova DeepSeek-V3.2    — best reasoning, free
+#   2. Gemini 2.5-flash-lite      — highest quality in benchmarks, 1,500 req/day
+#   3. NVIDIA deepseek-v4-flash   — strong reasoning, no daily cap
+#   4. Cerebras qwen3-235b        — large model, good prose, free
+#   5. NVIDIA llama-3.3-70b       — no daily cap, reliable fallback
+#   6. SambaNova llama-3.3-70b    — fast, good output length, free
+#   7. SambaNova llama-4-maverick  — fastest, shorter output, free
+#   8. Groq llama-3.3-70b         — fast, 1,000 req/day cap
+#   9. HF/novita llama-3.3-70b    — free but slow (~11s)
+#  10. Mistral small              — slowest (~9s), 1B tokens/month
+#  11. OpenRouter gemma-4-26b     — free, last resort (rate-limited often)
 #  12. Static fallback            — never fails
 #
 # Revision pass prepends: SambaNova DeepSeek-V3.2 → NVIDIA deepseek-v4-flash
@@ -164,20 +164,21 @@ def run(state: ResearchState) -> ResearchState:
     if NVIDIA_API_KEY:
         providers.append(("nvidia-deepseek", lambda c: _call_openai_compatible(
             "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_WRITER, c)))
-        providers.append(("nvidia-llama", lambda c: _call_openai_compatible(
-            "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_LLAMA, c)))
-    if SAMBANOVA_API_KEY:
-        providers.append(("sambanova-maverick", lambda c: _call_openai_compatible(
-            "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL_MAVERICK, c)))
-        providers.append(("sambanova-llama", lambda c: _call_openai_compatible(
-            "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL, c)))
     if CEREBRAS_API_KEY:
         providers.append(("cerebras-qwen3", lambda c: _call_openai_compatible(
             "https://api.cerebras.ai/v1", CEREBRAS_API_KEY, CEREBRAS_MODEL_LARGE, c)))
+    if NVIDIA_API_KEY:
+        providers.append(("nvidia-llama", lambda c: _call_openai_compatible(
+            "https://integrate.api.nvidia.com/v1", NVIDIA_API_KEY, NVIDIA_MODEL_LLAMA, c)))
+    if SAMBANOVA_API_KEY:
+        providers.append(("sambanova-llama", lambda c: _call_openai_compatible(
+            "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL, c)))
+        providers.append(("sambanova-maverick", lambda c: _call_openai_compatible(
+            "https://api.sambanova.ai/v1", SAMBANOVA_API_KEY, SAMBANOVA_MODEL_MAVERICK, c)))
+    providers.append(("groq", _try_groq))
     if HUGGINGFACE_API_KEY:
         providers.append(("hf-novita", lambda c: _call_openai_compatible(
             "https://router.huggingface.co/novita/v3/openai", HUGGINGFACE_API_KEY, HF_NOVITA_MODEL, c)))
-    providers.append(("groq", _try_groq))
     if MISTRAL_API_KEY:
         providers.append(("mistral", lambda c: _call_openai_compatible(
             "https://api.mistral.ai/v1", MISTRAL_API_KEY, MISTRAL_MODEL, c)))
