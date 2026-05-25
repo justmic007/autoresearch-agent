@@ -140,33 +140,25 @@ export default function Home() {
     <div className="min-h-screen" style={{ background: 'var(--paper)' }}>
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <header className="border-b px-8 py-6 flex items-end justify-between"
+      <header className="border-b px-4 md:px-8 py-4 md:py-6 flex items-center justify-between"
         style={{ borderColor: 'var(--border)' }}>
         <div>
-          <h1 className="font-serif text-4xl tracking-tight">
+          <h1 className="font-serif text-3xl md:text-4xl tracking-tight">
             Auto<em className="italic" style={{ color: 'var(--accent)' }}>Research</em>
           </h1>
-          <p className="font-mono text-xs mt-1 tracking-widest uppercase"
+          <p className="font-mono text-xs mt-1 tracking-wide uppercase hidden sm:block"
             style={{ color: 'var(--muted)' }}>
-            Multi-Agent Research System · LangGraph · Free LLMs
+            Deep research on any topic, instantly
           </p>
         </div>
-        <div className="hidden md:flex gap-2">
-          {AGENTS.map(a => (
-            <span key={a} className="font-mono text-xs px-2 py-1 border rounded-sm"
-              style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
-              {AGENT_META[a].label}
-            </span>
-          ))}
-        </div>
         <Link href="/history"
-          className="font-mono text-xs uppercase tracking-widest px-4 py-2 border ml-4"
+          className="font-mono text-xs uppercase tracking-widest px-3 py-2 border"
           style={{ borderColor: 'var(--border)', color: 'var(--muted)' }}>
           History
         </Link>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-24">
+      <main className="max-w-4xl mx-auto px-4 py-12 md:py-24">
 
         {/* ── Search box ──────────────────────────────────── */}
         <div className="mb-10">
@@ -184,15 +176,15 @@ export default function Home() {
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              placeholder="Ask anything — What is the state of nuclear fusion in 2025?"
-              className="flex-1 px-4 py-3 outline-none font-serif text-lg bg-transparent placeholder:italic"
+              placeholder="Ask anything…"
+              className="flex-1 px-3 md:px-4 py-3 outline-none font-serif text-base md:text-lg bg-transparent placeholder:italic"
               style={{ color: 'var(--ink)', caretColor: 'var(--accent)' }}
               disabled={loading}
             />
             <button
               onClick={handleSubmit}
               disabled={loading || !query.trim()}
-              className="px-6 font-mono text-xs uppercase tracking-widest transition-colors"
+              className="px-4 md:px-6 font-mono text-xs uppercase tracking-widest transition-colors shrink-0"
               style={{
                 background: loading ? 'var(--muted)' : 'var(--ink)',
                 color: 'var(--paper)',
@@ -200,7 +192,7 @@ export default function Home() {
                 cursor: loading ? 'not-allowed' : 'pointer',
               }}
             >
-              {loading ? 'Researching…' : 'Research →'}
+              {loading ? '…' : '→'}
             </button>
           </div>
         </div>
@@ -219,14 +211,14 @@ export default function Home() {
                 return (
                   <div
                     key={`${agent}-${i}`}
-                    className="flex-1 py-3 text-center border-r last:border-r-0 transition-colors duration-300"
+                    className="flex-1 py-2 md:py-3 text-center border-r last:border-r-0 transition-colors duration-300"
                     style={{ ...agentBg(status), borderColor: 'var(--border)' }}
                   >
-                    <div className={`text-lg mb-1 ${status === 'active' ? 'animate-pulse' : ''}`}>
+                    <div className={`text-base md:text-lg mb-1 ${status === 'active' ? 'animate-pulse' : ''}`}>
                       {AGENT_META[agent].icon}
                       {status === 'done' && <span className="text-xs"> ✓</span>}
                     </div>
-                    <div className="font-mono text-xs uppercase tracking-wider"
+                    <div className="font-mono text-xs uppercase tracking-wider hidden sm:block"
                       style={agentTextColor(status)}>
                       {AGENT_META[agent].label}
                     </div>
@@ -294,7 +286,7 @@ export default function Home() {
 
             {/* Report body */}
             <div
-              className="bg-white border p-8 mb-4 report-content"
+              className="bg-white border p-4 md:p-8 mb-4 report-content"
               style={{ borderColor: 'var(--border)', boxShadow: '3px 3px 0 var(--border)' }}
               dangerouslySetInnerHTML={{ __html: marked(reportToShow) as string }}
             />
