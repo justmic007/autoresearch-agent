@@ -32,7 +32,6 @@ def _groq(model: str):
         messages=[{"role": "user", "content": "Say OK only"}],
         max_tokens=5,
         timeout=10,
-        response_format={"type": "json_object"} if "qwen" in model else None,
     )
     return r.choices[0].message.content.strip()
 
