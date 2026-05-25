@@ -135,28 +135,28 @@ export default function HistoryPage() {
         <div className="min-h-screen" style={{ background: 'var(--paper)' }}>
 
             {/* Header */}
-            <header className="border-b px-8 py-6 flex items-end justify-between"
+            <header className="border-b px-4 md:px-8 py-4 md:py-6 flex items-center justify-between"
                 style={{ borderColor: 'var(--border)' }}>
                 <div>
-                    <h1 className="font-serif text-4xl tracking-tight">
+                    <h1 className="font-serif text-3xl md:text-4xl tracking-tight">
                         Auto<em className="italic" style={{ color: 'var(--accent)' }}>Research</em>
                     </h1>
-                    <p className="font-mono text-xs mt-1 tracking-widest uppercase"
+                    <p className="font-mono text-xs mt-1 tracking-widest uppercase hidden sm:block"
                         style={{ color: 'var(--muted)' }}>
                         Research History
                     </p>
                 </div>
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-2 items-center">
                     <Link
                         href="/"
-                        className="font-mono text-xs uppercase tracking-widest px-4 py-2 border transition-colors"
+                        className="font-mono text-xs uppercase tracking-widest px-3 py-2 border transition-colors"
                         style={{ borderColor: 'var(--ink)', color: 'var(--ink)' }}>
-                        ← New Research
+                        ← New
                     </Link>
                     {jobs.length > 0 && (
                         <button
                             onClick={clearHistory}
-                            className="font-mono text-xs uppercase tracking-widest px-4 py-2 border transition-colors"
+                            className="font-mono text-xs uppercase tracking-widest px-3 py-2 border transition-colors"
                             style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>
                             Clear All
                         </button>
@@ -208,7 +208,7 @@ export default function HistoryPage() {
                         </div>
 
                         <div
-                            className="bg-white border p-8 mb-4 report-content"
+                            className="bg-white border p-4 md:p-8 mb-4 report-content"
                             style={{ borderColor: 'var(--border)', boxShadow: '3px 3px 0 var(--border)' }}
                             dangerouslySetInnerHTML={{ __html: marked(selected.report || '') as string }}
                         />
