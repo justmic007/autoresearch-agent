@@ -59,5 +59,11 @@ export async function getJobs() {
 
 export async function getJob(threadId: string) {
     const res = await fetch(`${API_URL}/research/${threadId}`)
+    if (!res.ok) throw new Error(`${res.status}`)
     return res.json()
+}
+
+export async function deleteJob(threadId: string) {
+    const res = await fetch(`${API_URL}/research/${threadId}`, { method: 'DELETE' })
+    return res.ok
 }

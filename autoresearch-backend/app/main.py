@@ -107,3 +107,13 @@ def get_job(thread_id: str):
 @app.get("/jobs")
 def get_jobs():
     return list_jobs()
+
+
+# ── Delete a specific job ─────────────────────────────────────
+@app.delete("/research/{thread_id}")
+def delete_job_endpoint(thread_id: str):
+    from app.memory.redis_state import delete_job
+    deleted = delete_job(thread_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"deleted": thread_id}

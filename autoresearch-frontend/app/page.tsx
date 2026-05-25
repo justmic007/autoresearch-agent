@@ -104,14 +104,14 @@ export default function Home() {
           setLoading(false)
           AGENTS.forEach(a => setAgentStatus(a, 'done'))
 
-          // save to localStorage
+          // save to localStorage — include full report to survive Redis TTL
           const historyItem = {
             thread_id: completeData.thread_id,
             query: completeData.query,
             quality_score: completeData.quality_score?.total ?? 0,
-            finished_at: completeData.duration_seconds
-              ? Math.floor(Date.now() / 1000)
-              : Math.floor(Date.now() / 1000),
+            quality_score_detail: completeData.quality_score,
+            report: completeData.report,
+            finished_at: Math.floor(Date.now() / 1000),
           }
           const existing = JSON.parse(localStorage.getItem('autoresearch_history') || '[]')
           existing.unshift(historyItem)
@@ -166,7 +166,7 @@ export default function Home() {
         </Link>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-12">
+      <main className="max-w-4xl mx-auto px-4 py-24">
 
         {/* ── Search box ──────────────────────────────────── */}
         <div className="mb-10">

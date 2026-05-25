@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getJob } from '@/lib/api'
+import { getJob, deleteJob } from '@/lib/api'
 import Link from 'next/link'
 import { marked } from 'marked'
 
@@ -10,6 +10,14 @@ interface HistoryItem {
     query: string
     quality_score: number
     finished_at: number
+    report?: string  // stored locally to survive Redis TTL expiry
+    quality_score_detail?: {
+        total: number
+        completeness: number
+        accuracy: number
+        coherence: number
+        feedback: string
+    }
 }
 
 interface JobResult {
@@ -25,41 +33,97 @@ interface JobResult {
     }
 }
 
+const LS_KEY = 'autoresearch_history'
+
+function loadHistory(): HistoryItem[] {
+    try {
+        const raw = localStorage.getItem(LS_KEY)
+        if (!raw) return []
+        return (JSON.parse(raw) as HistoryItem[]).sort((a, b) => b.finished_at - a.finished_at)
+    } catch {
+        return []
+    }
+}
+
+function saveHistory(jobs: HistoryItem[]) {
+    localStorage.setItem(LS_KEY, JSON.stringify(jobs.slice(0, 50)))
+}
+
 export default function HistoryPage() {
     const [jobs, setJobs] = useState<HistoryItem[]>([])
     const [selected, setSelected] = useState<JobResult | null>(null)
+    const [selectedId, setSelectedId] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
+    const [expired, setExpired] = useState(false)
 
     useEffect(() => {
-        const raw = localStorage.getItem('autoresearch_history')
-        if (raw) {
-            try {
-                const parsed = JSON.parse(raw) as HistoryItem[]
-                setJobs(parsed.sort((a, b) => b.finished_at - a.finished_at))
-            } catch {
-                // ignore malformed data
-            }
-        }
+        setJobs(loadHistory())
     }, [])
 
-    async function viewJob(thread_id: string) {
+    async function viewJob(job: HistoryItem) {
+        setExpired(false)
+
+        // Try localStorage first — survives Redis TTL expiry
+        if (job.report) {
+            setSelected({
+                query: job.query,
+                report: job.report,
+                finished_at: job.finished_at,
+                quality_score: job.quality_score_detail ?? {
+                    total: job.quality_score,
+                    completeness: 0,
+                    accuracy: 0,
+                    coherence: 0,
+                    feedback: '',
+                },
+            })
+            setSelectedId(job.thread_id)
+            return
+        }
+
+        // Fall back to API
         setLoading(true)
         setSelected(null)
+        setSelectedId(job.thread_id)
         try {
-            const data = await getJob(thread_id)
-            setSelected(data as JobResult)
+            const data = await getJob(job.thread_id) as JobResult
+            setSelected(data)
+
+            // Cache report locally for future views
+            const updated = jobs.map(j =>
+                j.thread_id === job.thread_id
+                    ? { ...j, report: data.report, quality_score_detail: data.quality_score }
+                    : j
+            )
+            setJobs(updated)
+            saveHistory(updated)
         } catch {
-            alert('Could not load this report. It may have expired.')
+            setExpired(true)
         } finally {
             setLoading(false)
         }
     }
 
+    function deleteItem(e: React.MouseEvent, thread_id: string) {
+        e.stopPropagation()
+        const updated = jobs.filter(j => j.thread_id !== thread_id)
+        setJobs(updated)
+        saveHistory(updated)
+        if (selectedId === thread_id) {
+            setSelected(null)
+            setSelectedId(null)
+        }
+        // Best-effort delete from Redis too
+        deleteJob(thread_id)
+    }
+
     function clearHistory() {
         if (confirm('Clear all history? This cannot be undone.')) {
-            localStorage.removeItem('autoresearch_history')
+            jobs.forEach(j => deleteJob(j.thread_id))
+            localStorage.removeItem(LS_KEY)
             setJobs([])
             setSelected(null)
+            setSelectedId(null)
         }
     }
 
@@ -94,7 +158,7 @@ export default function HistoryPage() {
                             onClick={clearHistory}
                             className="font-mono text-xs uppercase tracking-widest px-4 py-2 border transition-colors"
                             style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>
-                            Clear History
+                            Clear All
                         </button>
                     )}
                 </div>
@@ -122,7 +186,7 @@ export default function HistoryPage() {
                 ) : selected ? (
                     <div>
                         <button
-                            onClick={() => setSelected(null)}
+                            onClick={() => { setSelected(null); setSelectedId(null); setExpired(false) }}
                             className="font-mono text-xs uppercase tracking-widest mb-6 flex items-center gap-2"
                             style={{ color: 'var(--muted)' }}>
                             ← Back to History
@@ -146,9 +210,7 @@ export default function HistoryPage() {
                         <div
                             className="bg-white border p-8 mb-4 report-content"
                             style={{ borderColor: 'var(--border)', boxShadow: '3px 3px 0 var(--border)' }}
-                            dangerouslySetInnerHTML={{
-                                __html: marked(selected.report || '') as string
-                            }}
+                            dangerouslySetInnerHTML={{ __html: marked(selected.report || '') as string }}
                         />
 
                         {selected.quality_score?.feedback && (
@@ -164,6 +226,23 @@ export default function HistoryPage() {
                         )}
                     </div>
 
+                ) : expired && selectedId ? (
+                    <div className="text-center py-24">
+                        <p className="font-serif text-2xl mb-3" style={{ color: 'var(--ink)' }}>
+                            Report expired
+                        </p>
+                        <p className="font-mono text-xs uppercase tracking-widest mb-8"
+                            style={{ color: 'var(--muted)' }}>
+                            This report is no longer available — Redis TTL exceeded 24h
+                        </p>
+                        <button
+                            onClick={() => { setExpired(false); setSelectedId(null) }}
+                            className="font-mono text-xs uppercase tracking-widest px-6 py-3"
+                            style={{ background: 'var(--ink)', color: 'var(--paper)' }}>
+                            ← Back to History
+                        </button>
+                    </div>
+
                 ) : (
                     <div>
                         <p className="font-mono text-xs uppercase tracking-widest mb-4"
@@ -176,7 +255,7 @@ export default function HistoryPage() {
                                     key={`history-${job.thread_id}-${i}`}
                                     className="bg-white border p-4 cursor-pointer transition-all flex items-center justify-between gap-4"
                                     style={{ borderColor: 'var(--border)' }}
-                                    onClick={() => viewJob(job.thread_id)}
+                                    onClick={() => viewJob(job)}
                                     onMouseEnter={e => {
                                         (e.currentTarget as HTMLDivElement).style.boxShadow = '2px 2px 0 var(--ink)'
                                     }}
@@ -190,6 +269,9 @@ export default function HistoryPage() {
                                         </p>
                                         <p className="font-mono text-xs mt-1" style={{ color: 'var(--muted)' }}>
                                             {formatDate(job.finished_at)}
+                                            {job.report && (
+                                                <span className="ml-2" style={{ color: 'var(--accent)' }}>● cached</span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
@@ -200,6 +282,14 @@ export default function HistoryPage() {
                                         <span className="font-mono text-xs" style={{ color: 'var(--muted)' }}>
                                             View →
                                         </span>
+                                        <button
+                                            onClick={e => deleteItem(e, job.thread_id)}
+                                            className="font-mono text-xs px-2 py-1 border transition-colors"
+                                            style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
+                                            title="Delete this report"
+                                        >
+                                            ✕
+                                        </button>
                                     </div>
                                 </div>
                             ))}
