@@ -218,7 +218,7 @@ export default function Home() {
                       {AGENT_META[agent].icon}
                       {status === 'done' && <span className="text-xs"> ✓</span>}
                     </div>
-                    <div className="font-mono text-xs uppercase tracking-wider hidden sm:block"
+                    <div className="font-mono text-xs uppercase tracking-wider"
                       style={agentTextColor(status)}>
                       {AGENT_META[agent].label}
                     </div>
