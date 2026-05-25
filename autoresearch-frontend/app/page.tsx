@@ -166,7 +166,7 @@ export default function Home() {
         </Link>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-12">
+      <main className="max-w-4xl mx-auto px-4 py-24">
 
         {/* ── Search box ──────────────────────────────────── */}
         <div className="mb-10">
