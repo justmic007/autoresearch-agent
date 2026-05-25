@@ -146,7 +146,7 @@ export default function Home() {
           <h1 className="font-serif text-3xl md:text-4xl tracking-tight">
             Auto<em className="italic" style={{ color: 'var(--accent)' }}>Research</em>
           </h1>
-          <p className="font-mono text-xs mt-1 tracking-wide uppercase hidden sm:block"
+          <p className="font-mono text-xs mt-1 tracking-wide uppercase"
             style={{ color: 'var(--muted)' }}>
             Deep research on any topic, instantly
           </p>
@@ -192,7 +192,7 @@ export default function Home() {
                 cursor: loading ? 'not-allowed' : 'pointer',
               }}
             >
-              {loading ? '…' : '→'}
+              {loading ? 'Researching…' : 'Research →'}
             </button>
           </div>
         </div>

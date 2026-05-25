@@ -141,7 +141,7 @@ export default function HistoryPage() {
                     <h1 className="font-serif text-3xl md:text-4xl tracking-tight">
                         Auto<em className="italic" style={{ color: 'var(--accent)' }}>Research</em>
                     </h1>
-                    <p className="font-mono text-xs mt-1 tracking-widest uppercase hidden sm:block"
+                    <p className="font-mono text-xs mt-1 tracking-widest uppercase"
                         style={{ color: 'var(--muted)' }}>
                         Research History
                     </p>
