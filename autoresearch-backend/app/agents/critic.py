@@ -1,8 +1,8 @@
 # Critic agent - scores report quality and triggers revision if needed
 #
 # Fallback chain (dedicated — does NOT compete with Planner or Writer):
-#   1. Groq llama-4-scout   — 169ms, fastest, JSON mode
-#   2. Groq llama-3.3-70b   — 1.4s,  JSON mode, higher quality scoring
+#   1. Groq llama-3.3-70b   — 1.4s,  most accurate scoring, JSON mode
+#   2. Groq llama-4-scout   — 169ms, fast fallback, JSON mode
 #   3. Mistral small        — 1.0s,  good analytical reasoning
 #   4. Static fallback      — returns neutral 7/7/7, never fails
 
@@ -107,8 +107,8 @@ def run(state: ResearchState) -> ResearchState:
     )
 
     providers: list[tuple[str, callable]] = [
-        ("groq-scout", lambda p: _try_groq(p, GROQ_MODEL_FAST)),
         ("groq-70b",   lambda p: _try_groq(p, GROQ_MODEL)),
+        ("groq-scout", lambda p: _try_groq(p, GROQ_MODEL_FAST)),
     ]
     if MISTRAL_API_KEY:
         providers.append(("mistral", lambda p: _call_openai_compatible(
