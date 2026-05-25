@@ -36,9 +36,9 @@ pydantic>=2.10.0,<2.11.0
 # AI AGENT ORCHESTRATION STACK (Loosened inner dependencies)
 # ==============================================================================
 langchain==1.3.1
-langchain-anthropic==1.3.0
+# langchain-anthropic==1.3.0
 langgraph==1.2.0
-anthropic>=0.75.0
+# anthropic>=0.75.0
 langsmith>=0.3.45
 
 # ==============================================================================
@@ -67,4 +67,12 @@ tenacity==9.0.0
 pytest==8.3.3
 pytest-asyncio==0.24.0
 ruff==0.9.0
-google-genai
+
+# ==============================================================================
+# LLM PROVIDERS
+# ==============================================================================
+google-genai        # Gemini
+groq                # Groq (Llama 3.3 70B)
+openai              # Used for all OpenAI-compatible providers:
+                    # NVIDIA NIM, SambaNova, Mistral, Cerebras,
+                    # Cloudflare, HuggingFace, OpenRouter/DeepSeek

@@ -148,7 +148,7 @@ export default function Home() {
           </h1>
           <p className="font-mono text-xs mt-1 tracking-widest uppercase"
             style={{ color: 'var(--muted)' }}>
-            Multi-Agent Research System · Claude Sonnet · LangGraph
+            Multi-Agent Research System · LangGraph · Free LLMs
           </p>
         </div>
         <div className="hidden md:flex gap-2">

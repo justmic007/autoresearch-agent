@@ -1,28 +1,28 @@
 # AutoResearch Agent
 
-A production-grade multi-agent research system built with LangGraph, Claude, and FastAPI.
+A production-grade multi-agent research system built with LangGraph and FastAPI.
 
 ## Architecture
 
 ```
 User query (POST /research)
         ↓
-  Planner agent      — decomposes query into 3-5 subtasks (Claude)
+  Planner agent      — decomposes query into 3-5 subtasks (Groq)
         ↓
   Search agent       — calls Tavily for each subtask
         ↓
   RAG agent          — embeds results in ChromaDB, retrieves top-5 chunks
         ↓
-  Writer agent       — synthesises structured report (Claude)
+  Writer agent       — synthesises structured report (SambaNova / Gemini / NVIDIA)
         ↓
-  Critic agent       — scores quality 0-30 (Claude)
+  Critic agent       — scores quality 0-30 (Groq)
         ↓
   [if score < 20]    — routes back to Writer for one revision
         ↓
   Final report + metrics returned
 ```
 
-**Stack:** FastAPI · LangGraph · Claude Sonnet · Tavily · ChromaDB · sentence-transformers · Redis · Docker · LangSmith · GitHub Actions
+**Stack:** FastAPI · LangGraph · Groq · Gemini · SambaNova · NVIDIA NIM · Mistral · Cerebras · Tavily · Redis · Docker · LangSmith · GitHub Actions
 
 ## Quickstart
 
