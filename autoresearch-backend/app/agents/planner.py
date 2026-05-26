@@ -33,7 +33,7 @@ def _parse_subtasks(raw: str) -> list[str]:
             raw = raw[4:]
         raw = raw.strip()
     if "<think>" in raw:
-        raw = raw[raw.rfind("</think>") + 8:].strip()
+        raw = raw[raw.rfind("</think>") + 8 :].strip()
     try:
         parsed = json.loads(raw)
         subtasks = parsed.get("subtasks", [])
@@ -46,8 +46,11 @@ def _parse_subtasks(raw: str) -> list[str]:
 
 def _try_groq(query: str, model: str) -> tuple[list[str], int]:
     from groq import Groq
+
     client = Groq(api_key=GROQ_API_KEY)
-    response = client.chat.completions.create(
+
+    # qwen3 doesn't support json_object response format
+    kwargs = dict(
         model=model,
         messages=[
             {"role": "system", "content": SYSTEM},
@@ -55,9 +58,12 @@ def _try_groq(query: str, model: str) -> tuple[list[str], int]:
         ],
         temperature=0.1,
         max_tokens=512,
-        response_format={"type": "json_object"},
         timeout=TIMEOUT,
     )
+    if "qwen" not in model.lower():
+        kwargs["response_format"] = {"type": "json_object"}
+
+    response = client.chat.completions.create(**kwargs)
     raw = response.choices[0].message.content.strip()
     tokens = response.usage.total_tokens if response.usage else 0
     return _parse_subtasks(raw), tokens
@@ -77,9 +83,9 @@ def run(state: ResearchState) -> ResearchState:
     t0 = time.time()
 
     providers: list[tuple[str, callable]] = [
-        ("groq-scout",  lambda q: _try_groq(q, GROQ_MODEL_FAST)),
-        ("groq-qwen3",  lambda q: _try_groq(q, GROQ_MODEL_QWEN)),
-        ("groq-70b",    lambda q: _try_groq(q, GROQ_MODEL)),
+        ("groq-scout", lambda q: _try_groq(q, GROQ_MODEL_FAST)),
+        ("groq-qwen3", lambda q: _try_groq(q, GROQ_MODEL_QWEN)),
+        ("groq-70b", lambda q: _try_groq(q, GROQ_MODEL)),
         ("static-fallback", _static_fallback),
     ]
 
